@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <title>Book Selection</title>
+</head>
+<body class="black-bg">
+  <h1>Select a Book</h1>
+  <div class="book-list">
+    {% for book in books %}
+      <div class="book-card">
+        <img src="{{ book.cover }}" alt="{{ book.title }} Cover" class="cover-image">
+        <h2>{{ book.title }}</h2>
+        <p>Genre: {{ book.genre }}</p>
+        <p>Difficulty: {{ book.difficulty }}</p>
+        <p>Age: {{ book.age }}</p>
+        <a href="/story/{{ book.folder }}">Read Story</a>
+      </div>
+    {% endfor %}
+  </div>
+</body>
+</html>

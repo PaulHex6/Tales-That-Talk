@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <title>{{ book_data.title }}</title>
+  <style>
+    /* Center image */
+    #page-image {
+      display: block;
+      margin: 0 auto;
+      width: 300px;
+      height: auto;
+    }
+
+    /* Button styling */
+    .back-button, .controls button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px;
+      display: inline-block;
+      text-decoration: none;
+      color: #000;
+      background-color: #ccc;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .back-button:hover, .controls button:hover {
+      background-color: #bbb;
+    }
+
+    /* Soft yellow highlight with 30% opacity */
+    .highlight {
+      background-color: rgba(255, 255, 0, 0.3); /* Light yellow with 30% opacity */
+    }
+
+    /* Center text content */
+    #page-text {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 18px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body class="black-bg">
+  <h1>{{ book_data.title }}</h1>
+
+  <!-- Back to All Books Button -->
+  <a href="/" class="back-button" onclick="stopTTS()">Back to All Books</a>
+
+  <div class="book-content">
+    <div class="page-left">
+      <img id="page-image" src="" alt="Page Image">
+      <p id="page-text">Loading...</p>
+    </div>
+    <div class="controls">
+      <button onclick="playPause()">Play</button>
+      <div id="progress-bar"></div>
+    </div>
+  </div>
+
+  <script>
+    const bookData = JSON.parse(`{{ book_data | tojson | safe }}`);
+    const bookFolder = "{{ folder }}";
+    const language = bookData.language || "en-US";
+    let currentPage = 0;
+    let isPlaying = false;
+    let highlightTimeout = null;  // Timeout for sentence highlighting
+    const ttsRate = 0.8; // Adjust TTS speed
+    const playPauseButton = document.querySelector(".controls button"); // Reference to play/pause button
+
+    function loadPage(pageIndex) {
+      if (pageIndex < bookData.pages.length) {
+        const pageData = bookData.pages[pageIndex];
+        
+        // Set image and split text into sentences for highlighting
+        document.getElementById("page-image").src = `/books/${bookFolder}/${pageData.image}`;
+        setHighlightedText(pageData.text);
+
+      } else {
+        // Display end of story message
+        document.getElementById("page-text").textContent = "Congratulations! You've finished the story!";
+        document.getElementById("page-image").src = ""; // Clear image if desired
+        isPlaying = false;
+        playPauseButton.textContent = "Play";
+      }
+    }
+
+    function setHighlightedText(text) {
+      // Split text into sentences and wrap each sentence in a span
+      const sentences = text.match(/[^.!?]+[.!?]*/g) || [text]; // Split text by sentences
+      document.getElementById("page-text").innerHTML = sentences.map((sentence, index) => 
+        `<span id="sentence-${index}">${sentence}</span>`).join(" ");
+    }
+
+    function playPause() {
+      // Cancel any existing speech to reset TTS
+      speechSynthesis.cancel();
+
+      if (isPlaying) {
+        // Stop TTS and clear any highlight intervals
+        isPlaying = false;
+        clearTimeout(highlightTimeout);
+        playPauseButton.textContent = "Play";
+      } else {
+        // Ensure queue is cleared, then create new utterance and speak
+        setTimeout(() => {
+          const pageData = bookData.pages[currentPage];
+          const utterance = new SpeechSynthesisUtterance(pageData.text);
+          utterance.lang = language;
+          utterance.rate = ttsRate;
+
+          utterance.onend = function() {
+            isPlaying = false;
+            playPauseButton.textContent = "Play";
+            currentPage++;
+            loadPage(currentPage); // Load the next page automatically
+          };
+
+          speechSynthesis.speak(utterance);
+          isPlaying = true;
+          playPauseButton.textContent = "Pause";
+          startSentenceHighlighting();
+        }, 200); // Slightly longer delay to ensure the queue is fully cleared
+      }
+    }
+
+    function startSentenceHighlighting() {
+      const sentences = document.querySelectorAll("#page-text span");
+      let sentenceIndex = 0;
+
+      // Clear any existing timeout
+      clearTimeout(highlightTimeout);
+
+      // Function to highlight each sentence in sequence
+      function highlightNextSentence() {
+        // Remove highlight from previous sentence
+        if (sentenceIndex > 0) {
+          sentences[sentenceIndex - 1].classList.remove("highlight");
+        }
+
+        // Highlight current sentence
+        if (sentenceIndex < sentences.length) {
+          sentences[sentenceIndex].classList.add("highlight");
+          sentenceIndex++;
+
+          // Set timeout for next sentence based on TTS speed and sentence length
+          const sentenceDuration = calculateSentenceDuration(sentences[sentenceIndex - 1].textContent);
+          highlightTimeout = setTimeout(highlightNextSentence, sentenceDuration);
+        }
+      }
+
+      // Start highlighting from the first sentence
+      highlightNextSentence();
+    }
+
+    // Calculate approximate duration for each sentence based on length and TTS rate
+    function calculateSentenceDuration(sentence) {
+      const words = sentence.split(" ").length;
+      const estimatedDuration = words * 300; // 300 ms per word as a base
+      return estimatedDuration / ttsRate; // Adjust with TTS rate
+    }
+
+    // Stop TTS when navigating back to all books
+    function stopTTS() {
+      speechSynthesis.cancel(); // Immediately stop any ongoing TTS
+      clearTimeout(highlightTimeout); // Clear any active highlighting
+      isPlaying = false; // Reset play state
+      playPauseButton.textContent = "Play"; // Reset button text
+    }
+
+    // Load the first page on page load
+    loadPage(currentPage);
+  </script>
+</body>
+</html>
