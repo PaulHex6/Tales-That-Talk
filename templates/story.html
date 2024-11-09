@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/static/css/styles.css">
   <title>{{ book_data.title }}</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
   <style>
     /* Center image */
     #page-image {
@@ -49,8 +48,8 @@
 <body class="black-bg">
   <h1>{{ book_data.title }}</h1>
 
-  <!-- Back to All Books Button -->
-  <a href="/" class="back-button" onclick="stopTTS()">Back to All Books</a>
+  <!-- Back Button -->
+  <a href="/" class="read-story-button" onclick="stopTTS()">Back to All Books</a>
 
   <div class="book-content">
     <div class="page-left">
@@ -58,14 +57,14 @@
       <p id="page-text">Loading...</p>
     </div>
     <div class="controls">
-      <button onclick="playPause()">Play</button>
-      <div id="progress-bar"></div>
+      <button onclick="playPause()" class="read-story-button">Play</button>
     </div>
   </div>
 
   <script>
     const bookData = JSON.parse(`{{ book_data | tojson | safe }}`);
     const bookFolder = "{{ folder }}";
+    const basePath = '/books';
     const language = bookData.language || "en-US";
     let currentPage = 0;
     let isPlaying = false;
@@ -76,9 +75,14 @@
     function loadPage(pageIndex) {
       if (pageIndex < bookData.pages.length) {
         const pageData = bookData.pages[pageIndex];
-        
-        // Set image and split text into sentences for highlighting
-        document.getElementById("page-image").src = `/books/${bookFolder}/${pageData.image}`;
+
+        // Handle image display
+        if (pageData.image) {
+          document.getElementById("page-image").src = `${basePath}/${bookFolder}/${pageData.image}`;
+        } else {
+          document.getElementById("page-image").src = ""; // Or set to a placeholder image
+        }
+
         setHighlightedText(pageData.text);
 
       } else {

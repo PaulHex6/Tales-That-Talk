@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/static/css/styles.css">
   <title>Book Selection</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body class="black-bg">
   <h1>Select a Book</h1>
@@ -16,9 +15,10 @@
         <p>Genre: {{ book.genre }}</p>
         <p>Difficulty: {{ book.difficulty }}</p>
         <p>Age: {{ book.age }}</p>
-        <a href="/story/{{ book.folder }}">Read Story</a>
+        <a href="/story/{{ book.folder }}" class="read-story-button">Read Story</a> <!-- Added the class here -->
       </div>
     {% endfor %}
   </div>
+  <a href="/add_story" class="read-story-button">Add Story</a>
 </body>
 </html>

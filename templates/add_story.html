@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add New Story</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        .error {
+            color: red;
+        }
+        .page-grid {
+            display: flex;
+            flex-direction: column;
+        }
+        .page-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        .page-text, .page-image {
+            flex: 1;
+            margin: 10px;
+        }
+        .page-text textarea {
+            width: 100%;
+            height: 100px;
+        }
+        .buttons {
+            margin-top: 10px;
+        }
+        .buttons button {
+            margin-right: 5px;
+        }
+        /* Style for image previews */
+        .image-preview {
+            max-width: 100px;
+            max-height: 100px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body class="black-bg">
+    <h1>Add New Story</h1>
+
+    {% if errors %}
+    <div class="error">
+        <ul>
+        {% for error in errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Ensure 'form' is always defined -->
+    {% set form = form if form is defined else {} %}
+    <!-- Ensure 'page_images' and 'cover_image_url' are always defined -->
+    {% set page_images = page_images if page_images is defined else [] %}
+    {% set cover_image_url = cover_image_url if cover_image_url is defined else '' %}
+
+    <form id="story-form" method="post" enctype="multipart/form-data">
+        <label>Title: <input type="text" name="title" id="title" value="{{ form.get('title', [''])[0] }}"></label><br>
+        <label>Genre: <input type="text" name="genre" id="genre" value="{{ form.get('genre', [''])[0] }}"></label><br>
+        <label>Age:
+            <select name="age" id="age">
+                <option value="">Select Age</option>
+                <option value="4-6" {% if form.get('age', [''])[0] == '4-6' %}selected{% endif %}>4-6</option>
+                <option value="7-9" {% if form.get('age', [''])[0] == '7-9' %}selected{% endif %}>7-9</option>
+                <option value="10-12" {% if form.get('age', [''])[0] == '10-12' %}selected{% endif %}>10-12</option>
+            </select>
+        </label><br>
+        <label>Difficulty:
+            <select name="difficulty" id="difficulty">
+                <option value="">Select Difficulty</option>
+                <option value="Easy" {% if form.get('difficulty', [''])[0] == 'Easy' %}selected{% endif %}>Easy</option>
+                <option value="Medium" {% if form.get('difficulty', [''])[0] == 'Medium' %}selected{% endif %}>Medium</option>
+                <option value="Hard" {% if form.get('difficulty', [''])[0] == 'Hard' %}selected{% endif %}>Hard</option>
+            </select>
+        </label><br>
+        <label>Language: <input type="text" name="language" id="language" value="{{ form.get('language', [''])[0] }}"></label><br>
+        <label>Cover Image: <input type="file" name="cover_image" id="cover_image"></label><br>
+        {% if cover_image_url %}
+            <img src="{{ cover_image_url }}" alt="Cover Image" class="image-preview">
+        {% endif %}<br>
+        <label>Story Description (Prompt):<br>
+            <textarea name="prompt" id="story-prompt" cols="80" rows="5">{{ form.get('prompt', [''])[0] }}</textarea>
+        </label><br>
+
+        <h2>Pages</h2>
+        <div id="pages-container">
+            <!-- Pages will be added here -->
+        </div>
+        <button type="button" onclick="addPage()">Add Page</button><br><br>
+
+        <input type="submit" value="Save Story">
+    </form>
+
+    <script>
+        let pageCount = 0;
+
+        function addPage(text='', image_url='') {
+            pageCount++;
+            const pagesContainer = document.getElementById('pages-container');
+
+            const pageItem = document.createElement('div');
+            pageItem.className = 'page-item';
+
+            // Text area
+            const pageTextDiv = document.createElement('div');
+            pageTextDiv.className = 'page-text';
+            const pageTextLabel = document.createElement('label');
+            pageTextLabel.textContent = 'Page ' + pageCount + ' Text:';
+            const pageTextArea = document.createElement('textarea');
+            pageTextArea.name = 'page_text';
+            pageTextArea.value = text;
+
+            const textButtonsDiv = document.createElement('div');
+            textButtonsDiv.className = 'buttons';
+
+            const regenerateTextButton = document.createElement('button');
+            regenerateTextButton.type = 'button';
+            regenerateTextButton.textContent = 'Regenerate';
+            regenerateTextButton.onclick = function() {
+                const prompt = document.getElementById('story-prompt').value;
+                pageTextArea.value = generatePageText(prompt);
+            };
+
+            const aiAssistantTextButton = document.createElement('button');
+            aiAssistantTextButton.type = 'button';
+            aiAssistantTextButton.textContent = 'AI Assistant';
+            aiAssistantTextButton.onclick = function() {
+                const userPrompt = prompt('Enter prompt for this page:');
+                if (userPrompt) {
+                    pageTextArea.value = generatePageText(userPrompt);
+                }
+            };
+
+            textButtonsDiv.appendChild(regenerateTextButton);
+            textButtonsDiv.appendChild(aiAssistantTextButton);
+
+            pageTextDiv.appendChild(pageTextLabel);
+            pageTextDiv.appendChild(pageTextArea);
+            pageTextDiv.appendChild(textButtonsDiv);
+
+            // Image upload
+            const pageImageDiv = document.createElement('div');
+            pageImageDiv.className = 'page-image';
+            const pageImageLabel = document.createElement('label');
+            pageImageLabel.textContent = 'Page ' + pageCount + ' Image:';
+            const pageImageInput = document.createElement('input');
+            pageImageInput.type = 'file';
+            pageImageInput.name = 'page_image';
+
+            const imageButtonsDiv = document.createElement('div');
+            imageButtonsDiv.className = 'buttons';
+
+            const regenerateImageButton = document.createElement('button');
+            regenerateImageButton.type = 'button';
+            regenerateImageButton.textContent = 'Regenerate';
+            regenerateImageButton.onclick = function() {
+                const pageText = pageTextArea.value;
+                alert('Generated image based on page text: ' + pageText);
+                // In actual implementation, this would call a function to generate image
+            };
+
+            const aiAssistantImageButton = document.createElement('button');
+            aiAssistantImageButton.type = 'button';
+            aiAssistantImageButton.textContent = 'AI Assistant';
+            aiAssistantImageButton.onclick = function() {
+                const userPrompt = prompt('Enter prompt for image on this page:');
+                if (userPrompt) {
+                    alert('Generated image based on user prompt: ' + userPrompt);
+                    // In actual implementation, this would call a function to generate image
+                }
+            };
+
+            imageButtonsDiv.appendChild(regenerateImageButton);
+            imageButtonsDiv.appendChild(aiAssistantImageButton);
+
+            pageImageDiv.appendChild(pageImageLabel);
+            pageImageDiv.appendChild(pageImageInput);
+            pageImageDiv.appendChild(imageButtonsDiv);
+
+            // Image preview if existing
+            if (image_url) {
+                const imgPreview = document.createElement('img');
+                imgPreview.src = image_url;
+                imgPreview.alt = 'Existing Image';
+                imgPreview.className = 'image-preview';
+                pageImageDiv.appendChild(imgPreview);
+            }
+
+            // Hidden input to retain existing image filename
+            const existingImageInput = document.createElement('input');
+            existingImageInput.type = 'hidden';
+            existingImageInput.name = 'existing_page_image';
+            existingImageInput.value = image_url ? image_url : '';
+            pageImageDiv.appendChild(existingImageInput);
+
+            pageItem.appendChild(pageTextDiv);
+            pageItem.appendChild(pageImageDiv);
+
+            pagesContainer.appendChild(pageItem);
+        }
+
+        function generatePageText(prompt) {
+            // Dummy function to simulate page text generation
+            return 'Generated page text based on prompt: ' + prompt;
+        }
+
+        // Load existing pages with images
+        window.onload = function() {
+            var form = {{ form | tojson | safe }};
+            var page_texts = form.page_text || [];
+            var page_images = {{ page_images | tojson | safe }} || [];
+            if (page_texts.length > 0) {
+                for (let i = 0; i < page_texts.length; i++) {
+                    addPage(page_texts[i], page_images[i]);
+                }
+            } else {
+                addPage();
+            }
+        }
+    </script>
+</body>
+</html>
