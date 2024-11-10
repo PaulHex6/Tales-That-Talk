@@ -74,10 +74,13 @@ form#story-form {
   background-color: #2b2b2b;
   border-radius: 10px;
   padding: 25px;
+  padding-left: 30px; /* Add left padding */
+  padding-right: 30px; /* Add right padding to match */
   max-width: 700px;
   margin: 0 auto;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4);
 }
+
 
 form#story-form label {
   color: #ffffff;
@@ -88,8 +91,7 @@ form#story-form label {
 }
 
 form#story-form input[type="text"],
-form#story-form select,
-form#story-form textarea {
+form#story-form select {
   background-color: #444;
   color: #e0e0e0;
   border: 1px solid #666;
@@ -98,6 +100,7 @@ form#story-form textarea {
   padding: 10px;
   margin-bottom: 15px;
   font-size: 1em;
+  box-sizing: border-box; /* Ensures padding is included in the width */
 }
 
 form#story-form input[type="text"]::placeholder,

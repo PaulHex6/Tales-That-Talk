@@ -1,0 +1,26 @@
+{
+  "title": "Czerwony Kapturek",
+  "genre": "Ba\u015b\u0144",
+  "age": "4-6",
+  "difficulty": "Easy",
+  "language": "pl-PL",
+  "cover": "cover_cover.webp",
+  "pages": [
+    {
+      "text": "Dawno, dawno temu \u017cy\u0142a sobie ma\u0142a dziewczynka, kt\u00f3ra mieszka\u0142a w wiosce niedaleko lasu. Zawsze nosi\u0142a czerwony p\u0142aszcz.",
+      "image": "page_1_page1.webp"
+    },
+    {
+      "text": "Pewnego dnia jej mama poprosi\u0142a j\u0105, by zanios\u0142a koszyk z jedzeniem do babci, kt\u00f3ra mieszka\u0142a g\u0142\u0119boko w lesie.",
+      "image": "page_2_page2.webp"
+    },
+    {
+      "text": "Czerwony Kapturek ruszy\u0142a przez las. Spotka\u0142a wilka, kt\u00f3ry zapyta\u0142, dok\u0105d idzie.",
+      "image": "page_3_page3.webp"
+    },
+    {
+      "text": "Opowiedzia\u0142a wilkowi o domu babci. Wilk pobieg\u0142 naprz\u00f3d, aby dotrze\u0107 tam pierwszy.",
+      "image": "page_4_page4.webp"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "title": "\u548f\u9e45",
+  "genre": "\u5510\u8bd7",
+  "age": "4-6",
+  "difficulty": "Easy",
+  "language": "Chinese",
+  "cover": "cover_page2.webp",
+  "pages": [
+    {
+      "text": "\u9e45\uff0c\u9e45\uff0c\u9e45\r\n\u66f2\u9879\u5411\u5929\u6b4c\u3002",
+      "image": "page_1_page1.webp"
+    },
+    {
+      "text": "\u767d\u6bdb\u6d6e\u7eff\u6c34\uff0c\r\n\u7ea2\u638c\u62e8\u6e05\u6ce2\u3002",
+      "image": "page_2_page2.webp"
+    }
+  ]
+}

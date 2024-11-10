@@ -17,7 +17,8 @@ def load_books():
         book_path = os.path.join(app.config['UPLOAD_FOLDER'], folder, 'book.json')
         if os.path.isfile(book_path):
             try:
-                with open(book_path, "r") as f:
+                # Open the file with UTF-8 encoding to handle special characters
+                with open(book_path, "r", encoding="utf-8") as f:
                     book_data = json.load(f)
                 cover_filename = book_data.get('cover', '')
                 cover_path = f"/books/{folder}/{cover_filename}" if cover_filename else "/static/default_cover.png"
@@ -39,13 +40,19 @@ def index():
     books = load_books()
     return render_template("index.html", books=books)
 
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify
+
 @app.route("/story/<folder>")
 def story(folder):
     book_path = os.path.join(app.config['UPLOAD_FOLDER'], folder, 'book.json')
     if os.path.isfile(book_path):
-        with open(book_path, "r") as f:
+        with open(book_path, "r", encoding="utf-8") as f:
             book_data = json.load(f)
-        return render_template("story.html", book_data=book_data, folder=folder)
+
+        # Serialize book_data to JSON to prevent special character issues
+        book_data_json = json.dumps(book_data, ensure_ascii=False)
+        return render_template("story.html", book_data=book_data_json, folder=folder)
+
     return "Story not found", 404
 
 @app.route("/add_story", methods=['GET', 'POST'])
@@ -119,8 +126,8 @@ def add_story():
         book_folder = os.path.join(app.config['UPLOAD_FOLDER'], folder_name)
         os.makedirs(book_folder, exist_ok=True)
         book_json_path = os.path.join(book_folder, 'book.json')
-        with open(book_json_path, 'w') as f:
-            json.dump(book_data, f, indent=2)
+        with open(book_json_path, 'w', encoding='utf-8') as f:
+            json.dump(book_data, f, indent=2, ensure_ascii=False)
 
         return redirect(url_for('story', folder=folder_name))
 

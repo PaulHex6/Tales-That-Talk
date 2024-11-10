@@ -14,21 +14,22 @@
     }
 
     /* Button styling */
-    .back-button, .controls button {
+    .read-story-button {
       padding: 10px 20px;
       font-size: 16px;
       cursor: pointer;
       margin: 10px;
       display: inline-block;
       text-decoration: none;
-      color: #000;
-      background-color: #ccc;
+      color: #fff;
+      background-color: #555;
       border: none;
       border-radius: 5px;
+      transition: background-color 0.3s;
     }
 
-    .back-button:hover, .controls button:hover {
-      background-color: #bbb;
+    .read-story-button:hover {
+      background-color: #666;
     }
 
     /* Soft yellow highlight with 30% opacity */
@@ -62,56 +63,64 @@
   </div>
 
   <script>
-    const bookData = JSON.parse(`{{ book_data | tojson | safe }}`);
+    // Parse and inspect book data safely from the server without additional JSON parsing
+    const bookData = {{ book_data | safe }};
     const bookFolder = "{{ folder }}";
-    const basePath = '/books';
+    const basePath = `/books/${bookFolder}`;
     const language = bookData.language || "en-US";
+
     let currentPage = 0;
     let isPlaying = false;
-    let highlightTimeout = null;  // Timeout for sentence highlighting
-    const ttsRate = 0.8; // Adjust TTS speed
-    const playPauseButton = document.querySelector(".controls button"); // Reference to play/pause button
+    let highlightTimeout = null;
+    const ttsRate = 0.8;
+    const playPauseButton = document.querySelector(".controls button");
+
+    // Debugging logs to inspect data
+    console.log("bookData:", bookData);
+    console.log("bookFolder:", bookFolder);
+    console.log("basePath:", basePath);
 
     function loadPage(pageIndex) {
       if (pageIndex < bookData.pages.length) {
         const pageData = bookData.pages[pageIndex];
 
+        // Debugging log to inspect page data
+        console.log("Loading page:", pageIndex, "Page data:", pageData);
+
         // Handle image display
         if (pageData.image) {
-          document.getElementById("page-image").src = `${basePath}/${bookFolder}/${pageData.image}`;
+          const imagePath = `${basePath}/${pageData.image}`;
+          console.log("Image path:", imagePath); // Log the constructed image path
+          document.getElementById("page-image").src = imagePath;
         } else {
-          document.getElementById("page-image").src = ""; // Or set to a placeholder image
+          document.getElementById("page-image").src = "";
         }
 
         setHighlightedText(pageData.text);
-
       } else {
-        // Display end of story message
         document.getElementById("page-text").textContent = "Congratulations! You've finished the story!";
-        document.getElementById("page-image").src = ""; // Clear image if desired
+        document.getElementById("page-image").src = "{{ url_for('static', filename='images/congratulations_image.webp') }}";
+        document.getElementById("page-image").style.display = "block"; 
         isPlaying = false;
         playPauseButton.textContent = "Play";
       }
     }
 
     function setHighlightedText(text) {
-      // Split text into sentences and wrap each sentence in a span
-      const sentences = text.match(/[^.!?]+[.!?]*/g) || [text]; // Split text by sentences
+      console.log("Setting text content:", text); // Log the text to ensure it's loaded correctly
+      const sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
       document.getElementById("page-text").innerHTML = sentences.map((sentence, index) => 
         `<span id="sentence-${index}">${sentence}</span>`).join(" ");
     }
 
     function playPause() {
-      // Cancel any existing speech to reset TTS
       speechSynthesis.cancel();
 
       if (isPlaying) {
-        // Stop TTS and clear any highlight intervals
         isPlaying = false;
         clearTimeout(highlightTimeout);
         playPauseButton.textContent = "Play";
       } else {
-        // Ensure queue is cleared, then create new utterance and speak
         setTimeout(() => {
           const pageData = bookData.pages[currentPage];
           const utterance = new SpeechSynthesisUtterance(pageData.text);
@@ -122,14 +131,14 @@
             isPlaying = false;
             playPauseButton.textContent = "Play";
             currentPage++;
-            loadPage(currentPage); // Load the next page automatically
+            loadPage(currentPage);
           };
 
           speechSynthesis.speak(utterance);
           isPlaying = true;
           playPauseButton.textContent = "Pause";
           startSentenceHighlighting();
-        }, 200); // Slightly longer delay to ensure the queue is fully cleared
+        }, 200);
       }
     }
 
@@ -137,44 +146,36 @@
       const sentences = document.querySelectorAll("#page-text span");
       let sentenceIndex = 0;
 
-      // Clear any existing timeout
       clearTimeout(highlightTimeout);
 
-      // Function to highlight each sentence in sequence
       function highlightNextSentence() {
-        // Remove highlight from previous sentence
         if (sentenceIndex > 0) {
           sentences[sentenceIndex - 1].classList.remove("highlight");
         }
 
-        // Highlight current sentence
         if (sentenceIndex < sentences.length) {
           sentences[sentenceIndex].classList.add("highlight");
           sentenceIndex++;
 
-          // Set timeout for next sentence based on TTS speed and sentence length
           const sentenceDuration = calculateSentenceDuration(sentences[sentenceIndex - 1].textContent);
           highlightTimeout = setTimeout(highlightNextSentence, sentenceDuration);
         }
       }
 
-      // Start highlighting from the first sentence
       highlightNextSentence();
     }
 
-    // Calculate approximate duration for each sentence based on length and TTS rate
     function calculateSentenceDuration(sentence) {
       const words = sentence.split(" ").length;
-      const estimatedDuration = words * 300; // 300 ms per word as a base
-      return estimatedDuration / ttsRate; // Adjust with TTS rate
+      const estimatedDuration = words * 300;
+      return estimatedDuration / ttsRate;
     }
 
-    // Stop TTS when navigating back to all books
     function stopTTS() {
-      speechSynthesis.cancel(); // Immediately stop any ongoing TTS
-      clearTimeout(highlightTimeout); // Clear any active highlighting
-      isPlaying = false; // Reset play state
-      playPauseButton.textContent = "Play"; // Reset button text
+      speechSynthesis.cancel();
+      clearTimeout(highlightTimeout);
+      isPlaying = false;
+      playPauseButton.textContent = "Play";
     }
 
     // Load the first page on page load
