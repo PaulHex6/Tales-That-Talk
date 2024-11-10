@@ -36,6 +36,9 @@
             max-width: 100px;
             max-height: 100px;
             margin-top: 10px;
+            border-radius: 5px;
+            display: block;
+            cursor: pointer; /* Pointer cursor to indicate the image is clickable */
         }
     </style>
 </head>
@@ -78,10 +81,11 @@
             </select>
         </label><br>
         <label>Language: <input type="text" name="language" id="language" value="{{ form.get('language', [''])[0] }}"></label><br>
-        <label>Cover Image: <input type="file" name="cover_image" id="cover_image"></label><br>
-        {% if cover_image_url %}
-            <img src="{{ cover_image_url }}" alt="Cover Image" class="image-preview">
-        {% endif %}<br>
+        
+        <label>Cover Image:</label>
+        <input type="file" name="cover_image" id="cover_image"><br>
+        <img id="cover-image-preview" src="{{ cover_image_url }}" alt="Cover Image" class="image-preview" style="display: {{ 'block' if cover_image_url else 'none' }};"><br>
+        
         <label>Story Description (Prompt):<br>
             <textarea name="prompt" id="story-prompt" cols="80" rows="5">{{ form.get('prompt', [''])[0] }}</textarea>
         </label><br>
@@ -98,7 +102,7 @@
     <script>
         let pageCount = 0;
 
-        function addPage(text='', image_url='') {
+        function addPage(text = '', image_url = '') {
             pageCount++;
             const pagesContainer = document.getElementById('pages-container');
 
@@ -113,6 +117,9 @@
             const pageTextArea = document.createElement('textarea');
             pageTextArea.name = 'page_text';
             pageTextArea.value = text;
+
+            pageTextDiv.appendChild(pageTextLabel);
+            pageTextDiv.appendChild(pageTextArea);
 
             const textButtonsDiv = document.createElement('div');
             textButtonsDiv.className = 'buttons';
@@ -138,8 +145,6 @@
             textButtonsDiv.appendChild(regenerateTextButton);
             textButtonsDiv.appendChild(aiAssistantTextButton);
 
-            pageTextDiv.appendChild(pageTextLabel);
-            pageTextDiv.appendChild(pageTextArea);
             pageTextDiv.appendChild(textButtonsDiv);
 
             // Image upload
@@ -151,6 +156,42 @@
             pageImageInput.type = 'file';
             pageImageInput.name = 'page_image';
 
+            pageImageDiv.appendChild(pageImageLabel);
+            pageImageDiv.appendChild(pageImageInput);
+
+            // Image preview
+            const imgPreview = document.createElement('img');
+            imgPreview.className = 'image-preview';
+            imgPreview.alt = 'Image preview';
+            imgPreview.style.display = image_url ? 'block' : 'none';
+
+            if (image_url) {
+                imgPreview.src = image_url;
+                pageImageInput.style.display = 'none'; // Hide the input if an existing image is loaded
+            }
+
+            pageImageInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imgPreview.src = e.target.result;
+                        imgPreview.style.display = 'block';
+                        pageImageInput.style.display = 'none'; // Hide file input when image is displayed
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Allow clicking the preview to re-open the file input
+            imgPreview.addEventListener('click', () => {
+                pageImageInput.style.display = 'block';
+                pageImageInput.click();
+                pageImageInput.style.display = 'none';
+            });
+
+            pageImageDiv.appendChild(imgPreview);
+
             const imageButtonsDiv = document.createElement('div');
             imageButtonsDiv.className = 'buttons';
 
@@ -160,7 +201,6 @@
             regenerateImageButton.onclick = function() {
                 const pageText = pageTextArea.value;
                 alert('Generated image based on page text: ' + pageText);
-                // In actual implementation, this would call a function to generate image
             };
 
             const aiAssistantImageButton = document.createElement('button');
@@ -170,32 +210,14 @@
                 const userPrompt = prompt('Enter prompt for image on this page:');
                 if (userPrompt) {
                     alert('Generated image based on user prompt: ' + userPrompt);
-                    // In actual implementation, this would call a function to generate image
                 }
             };
 
             imageButtonsDiv.appendChild(regenerateImageButton);
             imageButtonsDiv.appendChild(aiAssistantImageButton);
 
-            pageImageDiv.appendChild(pageImageLabel);
-            pageImageDiv.appendChild(pageImageInput);
+            // Place the buttons below the image preview
             pageImageDiv.appendChild(imageButtonsDiv);
-
-            // Image preview if existing
-            if (image_url) {
-                const imgPreview = document.createElement('img');
-                imgPreview.src = image_url;
-                imgPreview.alt = 'Existing Image';
-                imgPreview.className = 'image-preview';
-                pageImageDiv.appendChild(imgPreview);
-            }
-
-            // Hidden input to retain existing image filename
-            const existingImageInput = document.createElement('input');
-            existingImageInput.type = 'hidden';
-            existingImageInput.name = 'existing_page_image';
-            existingImageInput.value = image_url ? image_url : '';
-            pageImageDiv.appendChild(existingImageInput);
 
             pageItem.appendChild(pageTextDiv);
             pageItem.appendChild(pageImageDiv);
@@ -204,7 +226,6 @@
         }
 
         function generatePageText(prompt) {
-            // Dummy function to simulate page text generation
             return 'Generated page text based on prompt: ' + prompt;
         }
 
@@ -220,6 +241,29 @@
             } else {
                 addPage();
             }
+
+            // Cover image preview functionality
+            const coverImageInput = document.getElementById('cover_image');
+            const coverImagePreview = document.getElementById('cover-image-preview');
+
+            coverImageInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        coverImagePreview.src = e.target.result;
+                        coverImagePreview.style.display = 'block';
+                        coverImageInput.style.display = 'none'; // Hide file input when image is displayed
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            coverImagePreview.addEventListener('click', () => {
+                coverImageInput.style.display = 'block';
+                coverImageInput.click();
+                coverImageInput.style.display = 'none';
+            });
         }
     </script>
 </body>

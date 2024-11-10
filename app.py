@@ -48,12 +48,11 @@ def story(folder):
     if os.path.isfile(book_path):
         with open(book_path, "r", encoding="utf-8") as f:
             book_data = json.load(f)
-
-        # Serialize book_data to JSON to prevent special character issues
-        book_data_json = json.dumps(book_data, ensure_ascii=False)
-        return render_template("story.html", book_data=book_data_json, folder=folder)
-
+        
+        # Pass `book_data` as-is, without additional serialization
+        return render_template("story.html", book_data=book_data, folder=folder)
     return "Story not found", 404
+
 
 @app.route("/add_story", methods=['GET', 'POST'])
 def add_story():
