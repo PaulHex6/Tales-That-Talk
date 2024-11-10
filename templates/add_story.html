@@ -129,7 +129,7 @@
             regenerateTextButton.textContent = 'Regenerate';
             regenerateTextButton.onclick = function() {
                 const prompt = document.getElementById('story-prompt').value;
-                pageTextArea.value = generatePageText(prompt);
+                generatePageText(prompt, pageTextArea);
             };
 
             const aiAssistantTextButton = document.createElement('button');
@@ -138,7 +138,7 @@
             aiAssistantTextButton.onclick = function() {
                 const userPrompt = prompt('Enter prompt for this page:');
                 if (userPrompt) {
-                    pageTextArea.value = generatePageText(userPrompt);
+                    generatePageText(userPrompt, pageTextArea);
                 }
             };
 
@@ -167,9 +167,10 @@
 
             if (image_url) {
                 imgPreview.src = image_url;
-                pageImageInput.style.display = 'none'; // Hide the input if an existing image is loaded
+                // No need to hide the file input
             }
 
+            // Event listener for new file input
             pageImageInput.addEventListener('change', (event) => {
                 const file = event.target.files[0];
                 if (file) {
@@ -177,19 +178,13 @@
                     reader.onload = function(e) {
                         imgPreview.src = e.target.result;
                         imgPreview.style.display = 'block';
-                        pageImageInput.style.display = 'none'; // Hide file input when image is displayed
+                        // No need to hide the file input
                     };
                     reader.readAsDataURL(file);
                 }
             });
 
-            // Allow clicking the preview to re-open the file input
-            imgPreview.addEventListener('click', () => {
-                pageImageInput.style.display = 'block';
-                pageImageInput.click();
-                pageImageInput.style.display = 'none';
-            });
-
+            // Append the image preview
             pageImageDiv.appendChild(imgPreview);
 
             const imageButtonsDiv = document.createElement('div');
@@ -225,8 +220,33 @@
             pagesContainer.appendChild(pageItem);
         }
 
-        function generatePageText(prompt) {
-            return 'Generated page text based on prompt: ' + prompt;
+        // Updated generatePageText function
+        function generatePageText(prompt, pageTextArea) {
+            // Show a loading message or spinner if desired
+            pageTextArea.value = 'Generating story...';
+
+            fetch('/generate_text', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ prompt: prompt })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.generated_text) {
+                    // Update the text area with the generated text
+                    pageTextArea.value = data.generated_text;
+                } else {
+                    alert('Error generating text: ' + data.error);
+                    pageTextArea.value = ''; // Clear the text area on error
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while generating text.');
+                pageTextArea.value = ''; // Clear the text area on error
+            });
         }
 
         // Load existing pages with images
@@ -234,6 +254,7 @@
             var form = {{ form | tojson | safe }};
             var page_texts = form.page_text || [];
             var page_images = {{ page_images | tojson | safe }} || [];
+
             if (page_texts.length > 0) {
                 for (let i = 0; i < page_texts.length; i++) {
                     addPage(page_texts[i], page_images[i]);
@@ -253,16 +274,10 @@
                     reader.onload = function(e) {
                         coverImagePreview.src = e.target.result;
                         coverImagePreview.style.display = 'block';
-                        coverImageInput.style.display = 'none'; // Hide file input when image is displayed
+                        // No need to hide the file input
                     };
                     reader.readAsDataURL(file);
                 }
-            });
-
-            coverImagePreview.addEventListener('click', () => {
-                coverImageInput.style.display = 'block';
-                coverImageInput.click();
-                coverImageInput.style.display = 'none';
             });
         }
     </script>

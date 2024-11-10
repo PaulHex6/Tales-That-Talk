@@ -1,0 +1,42 @@
+{
+  "title": "Smok Wawelski",
+  "genre": "Baśń",
+  "age": "4-6",
+  "difficulty": "Medium",
+  "language": "Polski",
+  "cover": "cover_6.webp",
+  "pages": [
+    {
+      "text": "Dawno, dawno temu, w pięknym mieście Kraków, żyli ludzie, którzy codziennie cieszyli się spokojem i szczęściem. Ale w pobliżu miasta, w ciemnej jaskini pod Wzgórzem Wawelskim, mieszkał straszny smok.",
+      "image": "page_1_1.webp"
+    },
+    {
+      "text": "Smok był ogromny, miał zielone łuski i wielkie, ostre zęby. Każdego dnia wychodził ze swojej jaskini, straszył ludzi i pożerał ich owce oraz bydło.",
+      "image": "page_2_2.webp"
+    },
+    {
+      "text": "Mieszkańcy Krakowa bardzo się bali. Król Krak ogłosił, że ten, kto pokona smoka, otrzyma w nagrodę połowę jego królestwa i rękę królewskiej córki, pięknej księżniczki Wandy.",
+      "image": "page_3_3.webp"
+    },
+    {
+      "text": "Wielu rycerzy próbowało, ale smok zawsze zwyciężał. Aż pewnego dnia młody szewczyk, imieniem Skuba, wpadł na sprytny pomysł. Postanowił przygotować specjalną pułapkę.",
+      "image": "page_4_4.webp"
+    },
+    {
+      "text": "Skuba wypchał owcę siarką i smołą. Postawił ją przy jaskini smoka, mając nadzieję, że smok się na nią skusi.",
+      "image": "page_5_5.webp"
+    },
+    {
+      "text": "Smok wyszedł z jaskini i od razu pożarł owcę. Wkrótce poczuł ogromne pragnienie. Pędził do rzeki Wisły, aby ugasić pragnienie.",
+      "image": "page_6_6.webp"
+    },
+    {
+      "text": "Pił i pił wodę z Wisły, aż w końcu pękł! Całe miasto Kraków cieszyło się z wygranej, a Skuba został bohaterem. Król nagrodził go, a Kraków znów był spokojnym miejscem.",
+      "image": "page_7_7.webp"
+    },
+    {
+      "text": "Od tamtej pory, na Wawelu stoi pomnik Smoka Wawelskiego, przypominając o odwadze młodego szewczyka Skuby i jego sprytnym pomyśle.",
+      "image": "page_8_8.webp"
+    }
+  ]
+}

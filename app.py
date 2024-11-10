@@ -1,17 +1,18 @@
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify
 import json
 import os
-import uuid
-from werkzeug.utils import secure_filename
+from llama_api import generate_text
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'books'
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 25 MB limit
 
 @app.route('/books/<path:filename>')
 def book_static(filename):
     return send_from_directory(os.path.join(app.root_path, app.config['UPLOAD_FOLDER']), filename)
 
 def load_books():
+    print("Loading books...")
     books = []
     for folder in os.listdir(app.config['UPLOAD_FOLDER']):
         book_path = os.path.join(app.config['UPLOAD_FOLDER'], folder, 'book.json')
@@ -37,10 +38,9 @@ def load_books():
 
 @app.route("/")
 def index():
+    print("Rendering index page...")
     books = load_books()
     return render_template("index.html", books=books)
-
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify
 
 @app.route("/story/<folder>")
 def story(folder):
@@ -133,5 +133,19 @@ def add_story():
     # Render the add story form
     return render_template("add_story.html")
 
+@app.route('/generate_text', methods=['POST'])
+def generate_text_route():
+    data = request.get_json()
+    prompt = data.get('prompt', '')
+    if not prompt:
+        return jsonify({'error': 'No prompt provided'}), 400
+    try:
+        # Generate text using LLaMA model
+        generated_text = generate_text(prompt)
+        return jsonify({'generated_text': generated_text})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == "__main__":
+    print("Starting the Flask application...")
     app.run(debug=True, use_reloader=False)

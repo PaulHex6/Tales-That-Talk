@@ -13,6 +13,14 @@ h1 {
   font-weight: bold;
 }
 
+h3 {
+  text-align: center;
+  color:  #cccccc;
+  font-size: 1.2em;
+  margin-bottom: 20px;
+  font-weight: normal;
+}
+
 /* Book list styling */
 .book-list {
   display: flex;
