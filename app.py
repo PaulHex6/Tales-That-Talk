@@ -12,7 +12,7 @@ def book_static(filename):
     return send_from_directory(os.path.join(app.root_path, app.config['UPLOAD_FOLDER']), filename)
 
 def load_books():
-    print("Loading books...")
+    #print("Loading books...")
     books = []
     for folder in os.listdir(app.config['UPLOAD_FOLDER']):
         book_path = os.path.join(app.config['UPLOAD_FOLDER'], folder, 'book.json')
@@ -23,6 +23,9 @@ def load_books():
                     book_data = json.load(f)
                 cover_filename = book_data.get('cover', '')
                 cover_path = f"/books/{folder}/{cover_filename}" if cover_filename else "/static/default_cover.png"
+
+                #print(f"Loaded language for {folder}: {book_data.get('language', 'en-US')}")
+
                 books.append({
                     "title": book_data.get("title", "Unknown Title"),
                     "genre": book_data.get("genre", "Unknown Genre"),
@@ -38,7 +41,7 @@ def load_books():
 
 @app.route("/")
 def index():
-    print("Rendering index page...")
+    #print("Rendering index page...")
     books = load_books()
     return render_template("index.html", books=books)
 
@@ -181,5 +184,4 @@ def generate_full_story_route():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == "__main__":
-    print("Starting the Flask application...")
     app.run(debug=True, use_reloader=False)

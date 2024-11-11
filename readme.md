@@ -5,7 +5,7 @@
 ## Features
 
 - Create new stories with configurable age, difficulty, and language.
-- Generate story with LLaMA 3.2 1B and images (coming soon) for each page.
+- Generate story with LLM and images (coming soon) for each page.
 - Customize each page by uploading images or modifying text.
 
 ## Project Structure

@@ -129,7 +129,7 @@
 
             const regenerateTextButton = document.createElement('button');
             regenerateTextButton.type = 'button';
-            regenerateTextButton.textContent = 'Regenerate';
+            regenerateTextButton.textContent = '↺';
             regenerateTextButton.onclick = function() {
                 const prompt = pageTextArea.value || document.getElementById('story-prompt').value;
                 generatePageText(prompt, pageTextArea);
@@ -137,7 +137,7 @@
 
             const aiAssistantTextButton = document.createElement('button');
             aiAssistantTextButton.type = 'button';
-            aiAssistantTextButton.textContent = 'AI Assistant';
+            aiAssistantTextButton.textContent = 'AI';
             aiAssistantTextButton.onclick = function() {
                 const userPrompt = prompt('Enter prompt for this page:');
                 if (userPrompt) {
@@ -193,7 +193,7 @@
 
             const regenerateImageButton = document.createElement('button');
             regenerateImageButton.type = 'button';
-            regenerateImageButton.textContent = 'Regenerate';
+            regenerateImageButton.textContent = '↺';
             regenerateImageButton.onclick = function() {
                 const pageText = pageTextArea.value;
                 alert('Generated image based on page text: ' + pageText);
@@ -201,7 +201,7 @@
 
             const aiAssistantImageButton = document.createElement('button');
             aiAssistantImageButton.type = 'button';
-            aiAssistantImageButton.textContent = 'AI Assistant';
+            aiAssistantImageButton.textContent = 'AI';
             aiAssistantImageButton.onclick = function() {
                 const userPrompt = prompt('Enter prompt for image on this page:');
                 if (userPrompt) {

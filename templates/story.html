@@ -4,47 +4,6 @@
   <meta charset="UTF-8">
   <title>{{ book_data.title }}</title>
   <link rel="stylesheet" href="/static/css/styles.css">
-  <style>
-    /* Center image */
-    #page-image {
-      display: block;
-      margin: 0 auto;
-      width: 300px;
-      height: auto;
-    }
-
-    /* Button styling */
-    .read-story-button {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      margin: 10px;
-      display: inline-block;
-      text-decoration: none;
-      color: #fff;
-      background-color: #555;
-      border: none;
-      border-radius: 5px;
-      transition: background-color 0.3s;
-    }
-
-    .read-story-button:hover {
-      background-color: #666;
-    }
-
-    /* Soft yellow highlight with 30% opacity */
-    .highlight {
-      background-color: rgba(255, 255, 0, 0.3); /* Light yellow with 30% opacity */
-    }
-
-    /* Center text content */
-    #page-text {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 18px;
-      line-height: 1.5;
-    }
-  </style>
 </head>
 <body class="black-bg">
   <h1>{{ book_data.title }}</h1>
@@ -58,7 +17,9 @@
       <p id="page-text">Loading...</p>
     </div>
     <div class="controls">
-      <button onclick="playPause()" class="read-story-button">Play</button>
+      <button onclick="prevPage()" class="read-story-button prev-button">⇦</button>
+      <button onclick="playPause()" class="read-story-button play-pause-button">⯈</button>
+      <button onclick="nextPage()" class="read-story-button next-button">⇨</button>
     </div>
   </div>
 
@@ -73,7 +34,7 @@
     let isPlaying = false;
     let highlightTimeout = null;
     const ttsRate = 0.8;
-    const playPauseButton = document.querySelector(".controls button");
+    const playPauseButton = document.querySelector(".controls button.play-pause-button");
 
     // Debugging logs to inspect data
     console.log("bookData:", bookData);
@@ -81,28 +42,35 @@
     console.log("basePath:", basePath);
 
     function loadPage(pageIndex) {
+      stopTTS();
+
       if (pageIndex < bookData.pages.length) {
         const pageData = bookData.pages[pageIndex];
-
-        // Debugging log to inspect page data
-        console.log("Loading page:", pageIndex, "Page data:", pageData);
 
         // Handle image display
         if (pageData.image) {
           const imagePath = `${basePath}/${pageData.image}`;
-          console.log("Image path:", imagePath); // Log the constructed image path
           document.getElementById("page-image").src = imagePath;
         } else {
           document.getElementById("page-image").src = "";
         }
 
         setHighlightedText(pageData.text);
+
+        // Reset Play/Pause button
+        isPlaying = false;
+        playPauseButton.textContent = "⯈";
+
+        // Update navigation buttons
+        updateNavigationButtons();
       } else {
+        // Handle end of story
         document.getElementById("page-text").textContent = "Congratulations! You've finished the story!";
         document.getElementById("page-image").src = "{{ url_for('static', filename='images/congratulations_image.webp') }}";
-        document.getElementById("page-image").style.display = "block"; 
+        document.getElementById("page-image").style.display = "block";
         isPlaying = false;
-        playPauseButton.textContent = "Play";
+        playPauseButton.textContent = "⯈";
+        updateNavigationButtons();
       }
     }
 
@@ -114,33 +82,46 @@
     }
 
     function playPause() {
-      speechSynthesis.cancel();
+        speechSynthesis.cancel();
 
-      if (isPlaying) {
-        isPlaying = false;
-        clearTimeout(highlightTimeout);
-        playPauseButton.textContent = "Play";
-      } else {
-        setTimeout(() => {
-          const pageData = bookData.pages[currentPage];
-          const utterance = new SpeechSynthesisUtterance(pageData.text);
-          utterance.lang = language;
-          utterance.rate = ttsRate;
-
-          utterance.onend = function() {
+        if (isPlaying) {
             isPlaying = false;
-            playPauseButton.textContent = "Play";
-            currentPage++;
-            loadPage(currentPage);
-          };
+            clearTimeout(highlightTimeout);
+            playPauseButton.textContent = "⯈";
+        } else {
+            setTimeout(() => {
+            const pageData = bookData.pages[currentPage];
+            const utterance = new SpeechSynthesisUtterance(pageData.text);
+            utterance.lang = language || 'en-US';
+            utterance.rate = ttsRate;
 
-          speechSynthesis.speak(utterance);
-          isPlaying = true;
-          playPauseButton.textContent = "Pause";
-          startSentenceHighlighting();
-        }, 200);
-      }
+            utterance.onend = function() {
+                isPlaying = false;
+                playPauseButton.textContent = "⯈";
+            };
+
+            const speak = () => {
+                speechSynthesis.speak(utterance);
+                isPlaying = true;
+                playPauseButton.textContent = "❚❚";
+                startSentenceHighlighting();
+            };
+
+            // Check if voices are already loaded
+            if (speechSynthesis.getVoices().length !== 0) {
+                speak();
+            } else {
+                // Add an event listener for 'voiceschanged' to ensure voices are loaded before speaking
+                speechSynthesis.onvoiceschanged = () => {
+                speak();
+                // Optional: Remove the event listener after the first call to avoid redundant calls
+                speechSynthesis.onvoiceschanged = null;
+                };
+            }
+            }, 200);
+        }
     }
+
 
     function startSentenceHighlighting() {
       const sentences = document.querySelectorAll("#page-text span");
@@ -175,7 +156,31 @@
       speechSynthesis.cancel();
       clearTimeout(highlightTimeout);
       isPlaying = false;
-      playPauseButton.textContent = "Play";
+      playPauseButton.textContent = "⯈";
+    }
+
+    function prevPage() {
+      if (currentPage > 0) {
+        currentPage--;
+        loadPage(currentPage);
+      }
+    }
+
+    function nextPage() {
+      if (currentPage < bookData.pages.length - 1) {
+        currentPage++;
+        loadPage(currentPage);
+      } else {
+        alert("You've reached the end of the book!");
+      }
+    }
+
+    function updateNavigationButtons() {
+      const prevButton = document.querySelector(".controls button.prev-button");
+      const nextButton = document.querySelector(".controls button.next-button");
+
+      prevButton.disabled = currentPage === 0;
+      nextButton.disabled = currentPage >= bookData.pages.length - 1;
     }
 
     // Load the first page on page load

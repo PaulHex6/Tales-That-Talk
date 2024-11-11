@@ -186,3 +186,32 @@ form#story-form .buttons button:hover {
   border-radius: 5px;
   margin-bottom: 15px;
 }
+
+/* Center the page image */
+#page-image {
+  display: block;
+  margin: 0 auto;
+  width: 300px;
+  height: auto;
+}
+
+/* Center text content */
+#page-text {
+  text-align: center;
+  margin: 35px 35px;
+  margin-top: 20px;
+  font-size: 30px;
+  line-height: 1.5;
+}
+
+/* Controls alignment and spacing */
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.controls .read-story-button {
+  margin: 0 10px;
+}
