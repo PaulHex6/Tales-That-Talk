@@ -1,11 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, jsonify
 import json
 import os
-from llama_api import generate_text
+from language_model_utils import generate_page_text, generate_full_story
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'books'
-app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 25 MB limit
+app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024  # 25 MB limit
 
 @app.route('/books/<path:filename>')
 def book_static(filename):
@@ -52,7 +52,6 @@ def story(folder):
         # Pass `book_data` as-is, without additional serialization
         return render_template("story.html", book_data=book_data, folder=folder)
     return "Story not found", 404
-
 
 @app.route("/add_story", methods=['GET', 'POST'])
 def add_story():
@@ -140,9 +139,44 @@ def generate_text_route():
     if not prompt:
         return jsonify({'error': 'No prompt provided'}), 400
     try:
-        # Generate text using LLaMA model
-        generated_text = generate_text(prompt)
+        # Generate text for a page using LLaMA model
+        generated_text = generate_page_text(prompt)
         return jsonify({'generated_text': generated_text})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/generate_full_story', methods=['POST'])
+def generate_full_story_route():
+    data = request.get_json()
+    title = data.get('title', '').strip()
+    genre = data.get('genre', '').strip()
+    age = data.get('age', '').strip()
+    difficulty = data.get('difficulty', '').strip()
+    language = data.get('language', '').strip()
+    prompt = data.get('prompt', '').strip()
+
+    # Validate input data
+    errors = []
+    if not title:
+        errors.append("Title is required.")
+    if not genre:
+        errors.append("Genre is required.")
+    if not age:
+        errors.append("Age is required.")
+    if not difficulty:
+        errors.append("Difficulty is required.")
+    if not language:
+        errors.append("Language is required.")
+    if not prompt:
+        errors.append("Story description is required.")
+
+    if errors:
+        return jsonify({'error': ' '.join(errors)}), 400
+
+    try:
+        # Generate full story using LLaMA model
+        generated_story = generate_full_story(title, genre, age, difficulty, language, prompt)
+        return jsonify({'generated_story': generated_story})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

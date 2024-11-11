@@ -5,12 +5,13 @@
 ## Features
 
 - Create new stories with configurable age, difficulty, and language.
-- Generate text and images for each page with AI assistance.
+- Generate story with LLaMA 3.2 1B and images (coming soon) for each page.
 - Customize each page by uploading images or modifying text.
 
 ## Project Structure
 
 - **app.py**: Main Flask application with routes for creating, editing, and saving stories.
+- **language_model_utils.py**: Generates story text using language models.
 - **templates/**: HTML templates for various views, including the main library and the "Add Story" interface.
 - **static/**: Static files like CSS and images.
 - **books/**: Directory where saved stories are stored in a structured format.

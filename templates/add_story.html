@@ -90,6 +90,9 @@
             <textarea name="prompt" id="story-prompt" cols="80" rows="5">{{ form.get('prompt', [''])[0] }}</textarea>
         </label><br>
 
+        <!-- New Generate Story Button -->
+        <button type="button" onclick="generateFullStory()" class='read-story-button'>Generate Story</button><br><br>
+
         <h2>Pages</h2>
         <div id="pages-container">
             <!-- Pages will be added here -->
@@ -128,7 +131,7 @@
             regenerateTextButton.type = 'button';
             regenerateTextButton.textContent = 'Regenerate';
             regenerateTextButton.onclick = function() {
-                const prompt = document.getElementById('story-prompt').value;
+                const prompt = pageTextArea.value || document.getElementById('story-prompt').value;
                 generatePageText(prompt, pageTextArea);
             };
 
@@ -167,7 +170,6 @@
 
             if (image_url) {
                 imgPreview.src = image_url;
-                // No need to hide the file input
             }
 
             // Event listener for new file input
@@ -178,7 +180,6 @@
                     reader.onload = function(e) {
                         imgPreview.src = e.target.result;
                         imgPreview.style.display = 'block';
-                        // No need to hide the file input
                     };
                     reader.readAsDataURL(file);
                 }
@@ -220,10 +221,9 @@
             pagesContainer.appendChild(pageItem);
         }
 
-        // Updated generatePageText function
         function generatePageText(prompt, pageTextArea) {
             // Show a loading message or spinner if desired
-            pageTextArea.value = 'Generating story...';
+            pageTextArea.value = 'Generating text...';
 
             fetch('/generate_text', {
                 method: 'POST',
@@ -246,6 +246,96 @@
                 console.error('Error:', error);
                 alert('An error occurred while generating text.');
                 pageTextArea.value = ''; // Clear the text area on error
+            });
+        }
+
+        function generateFullStory() {
+            // Collect form data
+            const title = document.getElementById('title').value.trim();
+            const genre = document.getElementById('genre').value.trim();
+            const age = document.getElementById('age').value;
+            const difficulty = document.getElementById('difficulty').value;
+            const language = document.getElementById('language').value.trim();
+            const prompt = document.getElementById('story-prompt').value.trim();
+
+            // Validate required fields
+            let errors = [];
+            if (!title) errors.push("Title is required.");
+            if (!genre) errors.push("Genre is required.");
+            if (!age) errors.push("Age is required.");
+            if (!difficulty) errors.push("Difficulty is required.");
+            if (!language) errors.push("Language is required.");
+            if (!prompt) errors.push("Story description is required.");
+
+            if (errors.length > 0) {
+                alert(errors.join('\n'));
+                return;
+            }
+
+            // Show a loading message or spinner if desired
+            const generateButton = document.querySelector('button[onclick="generateFullStory()"]');
+            generateButton.disabled = true;
+            generateButton.textContent = 'Generating...';
+
+            // Send request to server to generate the story
+            fetch('/generate_full_story', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: title,
+                    genre: genre,
+                    age: age,
+                    difficulty: difficulty,
+                    language: language,
+                    prompt: prompt
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Re-enable the button
+                generateButton.disabled = false;
+                generateButton.textContent = 'Generate Story';
+
+                if (data.generated_story) {
+                    // Process the generated story
+                    const storyText = data.generated_story;
+
+                    // Split story into sentences
+                    const sentences = storyText.match(/[^\.!\?]+[\.!\?]+/g) || [storyText];
+
+                    // Group sentences into pages
+                    const pages = [];
+                    for (let i = 0; i < sentences.length && pages.length < 10; i += 2) {
+                        const pageText = sentences.slice(i, i + 2).join(' ').trim();
+                        pages.push(pageText);
+                    }
+
+                    // Populate the pages
+                    populatePages(pages);
+                } else {
+                    alert('Error generating story: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while generating the story.');
+                // Re-enable the button
+                generateButton.disabled = false;
+                generateButton.textContent = 'Generate Story';
+            });
+        }
+
+        function populatePages(pages) {
+            // Clear existing pages
+            const pagesContainer = document.getElementById('pages-container');
+            pagesContainer.innerHTML = '';
+            pageCount = 0;
+
+            // Add pages
+            pages.forEach(pageText => {
+                addPage(pageText);
             });
         }
 
@@ -274,7 +364,6 @@
                     reader.onload = function(e) {
                         coverImagePreview.src = e.target.result;
                         coverImagePreview.style.display = 'block';
-                        // No need to hide the file input
                     };
                     reader.readAsDataURL(file);
                 }
