@@ -3,4 +3,7 @@ __pycache__/
 venv*/
 versions/
 
+static/temp_images/
 books/Planety/
+books/Auta/
+

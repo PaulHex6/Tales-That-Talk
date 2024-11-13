@@ -1,3 +1,4 @@
+<!-- add_story.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,14 +32,13 @@
         .buttons button {
             margin-right: 5px;
         }
-        /* Style for image previews */
         .image-preview {
             max-width: 100px;
             max-height: 100px;
             margin-top: 10px;
             border-radius: 5px;
             display: block;
-            cursor: pointer; /* Pointer cursor to indicate the image is clickable */
+            cursor: pointer;
         }
     </style>
 </head>
@@ -55,9 +55,7 @@
     </div>
     {% endif %}
 
-    <!-- Ensure 'form' is always defined -->
     {% set form = form if form is defined else {} %}
-    <!-- Ensure 'page_images' and 'cover_image_url' are always defined -->
     {% set page_images = page_images if page_images is defined else [] %}
     {% set cover_image_url = cover_image_url if cover_image_url is defined else '' %}
 
@@ -90,13 +88,10 @@
             <textarea name="prompt" id="story-prompt" cols="80" rows="5">{{ form.get('prompt', [''])[0] }}</textarea>
         </label><br>
 
-        <!-- New Generate Story Button -->
         <button type="button" onclick="generateFullStory()" class='read-story-button'>Generate Story</button><br><br>
 
         <h2>Pages</h2>
-        <div id="pages-container">
-            <!-- Pages will be added here -->
-        </div>
+        <div id="pages-container"></div>
         <button type="button" onclick="addPage()" class='read-story-button'>Add Page</button><br><br>
 
         <input type="submit" value="Save Story" class='read-story-button'>
@@ -105,14 +100,13 @@
     <script>
         let pageCount = 0;
 
-        function addPage(text = '', image_url = '') {
+        function addPage(text = '', image_url = '', image_filename = '') {
             pageCount++;
             const pagesContainer = document.getElementById('pages-container');
 
             const pageItem = document.createElement('div');
             pageItem.className = 'page-item';
 
-            // Text area
             const pageTextDiv = document.createElement('div');
             pageTextDiv.className = 'page-text';
             const pageTextLabel = document.createElement('label');
@@ -147,10 +141,8 @@
 
             textButtonsDiv.appendChild(regenerateTextButton);
             textButtonsDiv.appendChild(aiAssistantTextButton);
-
             pageTextDiv.appendChild(textButtonsDiv);
 
-            // Image upload
             const pageImageDiv = document.createElement('div');
             pageImageDiv.className = 'page-image';
             const pageImageLabel = document.createElement('label');
@@ -162,7 +154,6 @@
             pageImageDiv.appendChild(pageImageLabel);
             pageImageDiv.appendChild(pageImageInput);
 
-            // Image preview
             const imgPreview = document.createElement('img');
             imgPreview.className = 'image-preview';
             imgPreview.alt = 'Image preview';
@@ -172,7 +163,6 @@
                 imgPreview.src = image_url;
             }
 
-            // Event listener for new file input
             pageImageInput.addEventListener('change', (event) => {
                 const file = event.target.files[0];
                 if (file) {
@@ -185,7 +175,6 @@
                 }
             });
 
-            // Append the image preview
             pageImageDiv.appendChild(imgPreview);
 
             const imageButtonsDiv = document.createElement('div');
@@ -196,7 +185,7 @@
             regenerateImageButton.textContent = '↺';
             regenerateImageButton.onclick = function() {
                 const pageText = pageTextArea.value;
-                alert('Generated image based on page text: ' + pageText);
+                generatePageImage(pageText, imgPreview, pageImageDiv);
             };
 
             const aiAssistantImageButton = document.createElement('button');
@@ -205,32 +194,58 @@
             aiAssistantImageButton.onclick = function() {
                 const userPrompt = prompt('Enter prompt for image on this page:');
                 if (userPrompt) {
-                    alert('Generated image based on user prompt: ' + userPrompt);
+                    generatePageImage(userPrompt, imgPreview, pageImageDiv);
                 }
             };
 
             imageButtonsDiv.appendChild(regenerateImageButton);
             imageButtonsDiv.appendChild(aiAssistantImageButton);
-
-            // Place the buttons below the image preview
             pageImageDiv.appendChild(imageButtonsDiv);
+
+            if (image_filename) {
+                const imageFilenameInput = document.createElement('input');
+                imageFilenameInput.type = 'hidden';
+                imageFilenameInput.name = 'page_image_filename';
+                imageFilenameInput.value = image_filename;
+                pageImageDiv.appendChild(imageFilenameInput);
+            }
 
             pageItem.appendChild(pageTextDiv);
             pageItem.appendChild(pageImageDiv);
-
             pagesContainer.appendChild(pageItem);
         }
 
         function generatePageText(prompt, pageTextArea) {
+            // Get additional context fields from the main form
+            const title = document.getElementById('title').value.trim();
+            const genre = document.getElementById('genre').value.trim();
+            const age = document.getElementById('age').value;
+            const difficulty = document.getElementById('difficulty').value;
+            const language = document.getElementById('language').value.trim();
+
+            // Find the previous and next page text if available
+            const previousText = getPreviousPageText(pageTextArea);
+            const nextText = getNextPageText(pageTextArea);
+
             // Show a loading message or spinner if desired
             pageTextArea.value = 'Generating text...';
 
+            // Send request to server with additional context
             fetch('/generate_text', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ prompt: prompt })
+                body: JSON.stringify({
+                    title: title,
+                    genre: genre,
+                    age: age,
+                    difficulty: difficulty,
+                    language: language,
+                    prompt: prompt,
+                    previous_text: previousText,
+                    next_text: nextText
+                })
             })
             .then(response => response.json())
             .then(data => {
@@ -247,6 +262,18 @@
                 alert('An error occurred while generating text.');
                 pageTextArea.value = ''; // Clear the text area on error
             });
+        }
+
+        function getPreviousPageText(currentPageTextArea) {
+            const pageItems = Array.from(document.querySelectorAll('.page-item textarea'));
+            const currentIndex = pageItems.indexOf(currentPageTextArea);
+            return currentIndex > 0 ? pageItems[currentIndex - 1].value : '';
+        }
+
+        function getNextPageText(currentPageTextArea) {
+            const pageItems = Array.from(document.querySelectorAll('.page-item textarea'));
+            const currentIndex = pageItems.indexOf(currentPageTextArea);
+            return currentIndex < pageItems.length - 1 ? pageItems[currentIndex + 1].value : '';
         }
 
         function generateFullStory() {
@@ -354,6 +381,76 @@
             }
 
             // Cover image preview functionality
+            const coverImageInput = document.getElementById('cover_image');
+            const coverImagePreview = document.getElementById('cover-image-preview');
+
+            coverImageInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        coverImagePreview.src = e.target.result;
+                        coverImagePreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function generatePageImage(prompt, imgPreview, pageImageDiv) {
+            imgPreview.src = '';
+            imgPreview.alt = 'Generating image...';
+
+            fetch('/generate_image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ prompt: prompt })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.image_url) {
+                    imgPreview.src = data.image_url;
+                    imgPreview.style.display = 'block';
+                    imgPreview.alt = 'Generated image';
+
+                    let imageFilenameInput = pageImageDiv.querySelector('input[name="page_image_filename"]');
+                    if (!imageFilenameInput) {
+                        imageFilenameInput = document.createElement('input');
+                        imageFilenameInput.type = 'hidden';
+                        imageFilenameInput.name = 'page_image_filename';
+                        pageImageDiv.appendChild(imageFilenameInput);
+                    }
+                    imageFilenameInput.value = data.filename;
+
+                    const pageImageInput = pageImageDiv.querySelector('input[name="page_image"]');
+                    if (pageImageInput) {
+                        pageImageInput.value = '';
+                    }
+                } else {
+                    alert('Error generating image: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while generating the image.');
+            });
+        }
+
+        window.onload = function() {
+            const form = {{ form | tojson | safe }};
+            const page_texts = form.page_text || [];
+            const page_images = {{ page_images | tojson | safe }} || [];
+
+            if (page_texts.length > 0) {
+                for (let i = 0; i < page_texts.length; i++) {
+                    addPage(page_texts[i], page_images[i]);
+                }
+            } else {
+                addPage();
+            }
+
             const coverImageInput = document.getElementById('cover_image');
             const coverImagePreview = document.getElementById('cover-image-preview');
 
