@@ -22,7 +22,7 @@ def generate_llm_text(prompt, max_new_tokens=50):
     chat_completion = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": "You are a creative assistant and storyteller specializing in writing engaging and age-appropriate content for books."},
+            {"role": "system", "content": "You are a creative storyteller specializing in writing engaging and age-appropriate books."},
             {"role": "user", "content": prompt}
         ]
     )
@@ -60,7 +60,7 @@ def generate_full_story(title, genre, age, difficulty, language, prompt):
     refined_prompt = (
         f"Write a children's story titled '{title}' in {language}, suitable for ages {age}, "
         f"with a {difficulty} difficulty level. The genre is {genre}. "
-        f"The story should be about '{prompt}'. Story should be 10 to 20 sentences."
+        f"The story should be about '{prompt}'. Story should be short, preferably 10-15 sentences and max 20 sentences."
     )
     generated_text = generate_llm_text(refined_prompt, max_new_tokens=500)
     return generated_text
