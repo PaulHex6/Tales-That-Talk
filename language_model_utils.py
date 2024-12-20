@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 # Initialize OpenAI client
 load_dotenv()
-client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 def generate_llm_text(prompt, max_new_tokens=50):
     """
@@ -86,7 +86,7 @@ def generate_image(prompt):
         # Open the image and save it in .webp format
         image = Image.open(BytesIO(image_response.content))
         image.save(filepath, "WEBP")
-        print(f"Path: {filepath}\{unique_filename}")
+        print(f"Path: {filepath}\\{unique_filename}")
 
         # Return the URL to the image and filename
         return {
