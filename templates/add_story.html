@@ -41,6 +41,7 @@
             cursor: pointer;
         }
     </style>
+    <script src="/static/js/trial_popup.js"></script>
 </head>
 <body class="black-bg">
     <h1>Add New Story</h1>
@@ -125,18 +126,23 @@
             regenerateTextButton.type = 'button';
             regenerateTextButton.textContent = '↺';
             regenerateTextButton.onclick = function() {
-                const prompt = pageTextArea.value || document.getElementById('story-prompt').value;
-                generatePageText(prompt, pageTextArea);
+                requestPopup(() => {
+                    const prompt = pageTextArea.value || document.getElementById('story-prompt').value;
+                    generatePageText(prompt, pageTextArea);
+                });
             };
+
 
             const aiAssistantTextButton = document.createElement('button');
             aiAssistantTextButton.type = 'button';
             aiAssistantTextButton.textContent = 'AI';
             aiAssistantTextButton.onclick = function() {
-                const userPrompt = prompt('Enter prompt for this page:');
-                if (userPrompt) {
-                    generatePageText(userPrompt, pageTextArea);
-                }
+                requestPopup(() => {
+                    const userPrompt = prompt('Enter prompt for this page:');
+                    if (userPrompt) {
+                        generatePageText(userPrompt, pageTextArea);
+                    }
+                });
             };
 
             textButtonsDiv.appendChild(regenerateTextButton);
@@ -184,20 +190,24 @@
             regenerateImageButton.type = 'button';
             regenerateImageButton.textContent = '↺';
             regenerateImageButton.onclick = function() {
-                const pageText = pageTextArea.value;
-                generatePageImage(pageText, imgPreview, pageImageDiv);
+                requestPopup(() => {
+                    const pageText = pageTextArea.value;
+                    generatePageImage(pageText, imgPreview, pageImageDiv);
+                });
             };
 
             const aiAssistantImageButton = document.createElement('button');
             aiAssistantImageButton.type = 'button';
             aiAssistantImageButton.textContent = 'AI';
             aiAssistantImageButton.onclick = function() {
-                const userPrompt = prompt('Enter prompt for image on this page:');
-                if (userPrompt) {
-                    generatePageImage(userPrompt, imgPreview, pageImageDiv);
-                }
+                requestPopup(() => {
+                    const userPrompt = prompt('Enter prompt for image on this page:');
+                    if (userPrompt) {
+                        generatePageImage(userPrompt, imgPreview, pageImageDiv);
+                    }
+                });
             };
-
+            
             imageButtonsDiv.appendChild(regenerateImageButton);
             imageButtonsDiv.appendChild(aiAssistantImageButton);
             pageImageDiv.appendChild(imageButtonsDiv);

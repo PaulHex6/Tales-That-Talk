@@ -58,6 +58,20 @@ def story(folder):
         return render_template("story.html", book_data=book_data, folder=folder)
     return "Story not found", 404
 
+BETA_FEATURE_PASSWORD = os.environ.get("BETA_FEATURE_PASSWORD", "pass")
+
+#AI functionality in BETA testing, show popup to request the access
+@app.route('/validate_popup', methods=['POST'])
+def validate_popup():
+    # Get password from the incoming request
+    data = request.get_json()
+    password = data.get("password", "")
+
+    # Validate password
+    if password == BETA_FEATURE_PASSWORD:
+        return jsonify({"success": True})  # Password validated
+    return jsonify({"success": False})  # Incorrect password
+
 @app.route("/add_story", methods=['GET', 'POST'])
 def add_story():
     if request.method == 'POST':
