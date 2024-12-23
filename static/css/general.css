@@ -35,13 +35,12 @@ h3 {
   padding: 15px;
 }
 
-/* Book Card */
 .book-card {
   background-color: var(--card-bg-color);
   border-radius: 10px;
   padding: 10px;
   text-align: center;
-  width: 160px; /* Default for desktop */
+  width: 160px;
   height: auto;
   display: flex;
   flex-direction: column;
@@ -198,13 +197,11 @@ form#story-form input[type="file"] {
 /* Mobile Styles */
 @media (max-width: 768px) {
   .book-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: space-evenly;
   }
 
   .book-card {
-    width: calc(50% - 10px); /* Two cards per row */
+    width: calc(50% - 10px);
     margin-bottom: 15px;
     box-shadow: none;
   }
