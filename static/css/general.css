@@ -13,15 +13,15 @@ body {
 h1 {
   text-align: center;
   color: var(--heading-color);
-  font-size: 2em;
-  margin-bottom: 15px;
+  font-size: 2em; /* Slightly reduced font size */
+  margin-bottom: 15px; /* Less margin */
   font-weight: bold;
 }
 
 h3 {
   text-align: center;
   color: var(--subheading-color);
-  font-size: 1.1em;
+  font-size: 1.1em; /* Slightly smaller font size */
   margin-bottom: 15px;
   font-weight: normal;
 }
@@ -30,18 +30,17 @@ h3 {
 .book-list {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around; /* Improved alignment for desktop */
-  gap: 20px; /* Reduced gap for desktop */
-  padding: 20px; /* Adjust padding for desktop */
+  justify-content: center;
+  gap: 15px; /* Less gap between cards */
+  padding: 15px; /* Reduced padding for a tighter layout */
 }
 
-/* Book Card */
 .book-card {
   background-color: var(--card-bg-color);
   border-radius: 10px;
   padding: 10px;
   text-align: center;
-  width: 160px; /* Default for desktop */
+  width: 160px;
   height: auto;
   display: flex;
   flex-direction: column;
@@ -58,24 +57,24 @@ h3 {
 
 /* Cover Image */
 .cover-image {
-  width: 140px;
-  height: 140px;
+  width: 140px; /* Larger width */
+  height: 140px; /* Square aspect ratio */
   border-radius: 5px;
-  margin-bottom: 8px;
+  margin-bottom: 8px; /* Tighter spacing below image */
   border: 2px solid var(--input-border-color);
 }
 
 /* Text in Book Cards */
 .book-card h2 {
-  font-size: 0.9em;
-  margin: 5px 0;
-  line-height: 1.2;
+  font-size: 0.9em; /* Smaller title font size */
+  margin: 5px 0; /* Reduced margin */
+  line-height: 1.2; /* Tighter line height */
 }
 
 .book-card p {
-  font-size: 0.85em;
-  margin: 3px 0;
-  line-height: 1.1;
+  font-size: 0.85em; /* Smaller font size for details */
+  margin: 3px 0; /* Tight spacing between lines */
+  line-height: 1.1; /* Compact line spacing */
 }
 
 /* Buttons */
@@ -104,8 +103,8 @@ h3 {
 form#story-form {
   background-color: var(--form-bg-color);
   border-radius: 10px;
-  padding: 20px 25px;
-  max-width: 650px;
+  padding: 20px 25px; /* Reduced padding */
+  max-width: 650px; /* Slightly reduced width */
   margin: 0 auto;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4);
 }
@@ -115,7 +114,7 @@ form#story-form label {
   font-weight: bold;
   margin-bottom: 5px;
   display: block;
-  font-size: 0.9em;
+  font-size: 0.9em; /* Slightly smaller label font size */
 }
 
 form#story-form input[type="text"],
@@ -125,9 +124,9 @@ form#story-form select {
   border: 1px solid var(--input-border-color);
   border-radius: 5px;
   width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  font-size: 0.9em;
+  padding: 8px; /* Reduced padding */
+  margin-bottom: 10px; /* Less spacing between form elements */
+  font-size: 0.9em; /* Slightly smaller font size */
   box-sizing: border-box;
 }
 
@@ -141,10 +140,10 @@ form#story-form input[type="file"] {
   color: var(--text-color);
   border: none;
   border-radius: 5px;
-  padding: 8px 15px;
-  font-size: 0.9em;
+  padding: 8px 15px; /* Reduced padding */
+  font-size: 0.9em; /* Slightly smaller font size */
   cursor: pointer;
-  margin: 8px 5px;
+  margin: 8px 5px; /* Tighter spacing */
   transition: background-color 0.2s, box-shadow 0.2s;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -162,25 +161,25 @@ form#story-form input[type="file"] {
 .error {
   color: var(--error-color);
   background-color: var(--form-bg-color);
-  padding: 8px;
+  padding: 8px; /* Reduced padding */
   border-radius: 5px;
-  margin-bottom: 10px;
+  margin-bottom: 10px; /* Reduced margin */
 }
 
 /* Images and text alignment */
 #page-image {
   display: block;
   margin: 0 auto;
-  width: 280px;
+  width: 280px; /* Slightly smaller width */
   height: auto;
 }
 
 #page-text {
   text-align: center;
-  margin: 25px 25px;
-  margin-top: 15px;
-  font-size: 28px;
-  line-height: 1.4;
+  margin: 25px 25px; /* Tighter margins */
+  margin-top: 15px; /* Reduced top margin */
+  font-size: 28px; /* Slightly smaller font size */
+  line-height: 1.4; /* Compact line height */
 }
 
 /* Controls alignment */
@@ -188,51 +187,9 @@ form#story-form input[type="file"] {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 15px;
+  margin-top: 15px; /* Reduced top margin */
 }
 
 .controls .read-story-button {
-  margin: 5px 5px;
-}
-
-/* Mobile Styles */
-@media (max-width: 768px) {
-  .book-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 15px;
-    padding: 10px; /* Reduced padding for mobile */
-  }
-
-  .book-card {
-    width: calc(50% - 10px); /* Two cards per row */
-    margin-bottom: 15px;
-  }
-
-  .cover-image {
-    width: 100px;
-    height: 100px;
-  }
-
-  h1 {
-    font-size: 1.5em;
-  }
-
-  .read-story-button {
-    width: 90%;
-    padding: 10px;
-  }
-}
-
-/* Desktop Styles */
-@media (min-width: 1024px) {
-  .book-list {
-    gap: 10px; /* Reduce gap for tighter layout */
-    padding: 10px 10px; /* Wider horizontal padding */
-  }
-
-  .book-card {
-    width: 200px; /* Slightly larger for desktop view */
-  }
+  margin: 5px 5px; /* Reduced margin */
 }
