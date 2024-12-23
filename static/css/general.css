@@ -30,17 +30,18 @@ h3 {
 .book-list {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 15px;
-  padding: 15px;
+  justify-content: space-around; /* Improved alignment for desktop */
+  gap: 20px; /* Reduced gap for desktop */
+  padding: 20px; /* Adjust padding for desktop */
 }
 
+/* Book Card */
 .book-card {
   background-color: var(--card-bg-color);
   border-radius: 10px;
   padding: 10px;
   text-align: center;
-  width: 160px;
+  width: 160px; /* Default for desktop */
   height: auto;
   display: flex;
   flex-direction: column;
@@ -197,13 +198,16 @@ form#story-form input[type="file"] {
 /* Mobile Styles */
 @media (max-width: 768px) {
   .book-list {
-    justify-content: space-evenly;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 10px; /* Reduced padding for mobile */
   }
 
   .book-card {
-    width: calc(50% - 10px);
+    width: calc(50% - 10px); /* Two cards per row */
     margin-bottom: 15px;
-    box-shadow: none;
   }
 
   .cover-image {
@@ -218,5 +222,17 @@ form#story-form input[type="file"] {
   .read-story-button {
     width: 90%;
     padding: 10px;
+  }
+}
+
+/* Desktop Styles */
+@media (min-width: 1024px) {
+  .book-list {
+    gap: 10px; /* Reduce gap for tighter layout */
+    padding: 10px 10px; /* Wider horizontal padding */
+  }
+
+  .book-card {
+    width: 200px; /* Slightly larger for desktop view */
   }
 }
