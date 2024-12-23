@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>{{ book_data.title }}</title>
-  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="stylesheet" href="/static/css/general.css">
+  <link rel="stylesheet" href="/static/css/themes.css">
 </head>
-<body class="black-bg">
+<body class="{{ theme }}">
   <h1>{{ book_data.title }}</h1>
 
   <!-- Back Button -->

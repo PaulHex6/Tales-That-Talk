@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>Tales That Talk</title>
-  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="stylesheet" href="/static/css/general.css">
+  <link rel="stylesheet" href="/static/css/themes.css">
 </head>
-<body class="black-bg">
+<body class="{{ theme }}">
   <h1>Tales That Talk 🔊</h1>
   <div class="book-list">
     {% for book in books %}

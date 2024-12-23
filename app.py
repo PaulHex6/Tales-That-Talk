@@ -41,6 +41,13 @@ def load_books():
                 print(f"Error decoding JSON for {folder}")
     return books
 
+current_theme = "theme-dark"
+
+@app.context_processor
+def inject_theme():
+    global current_theme
+    return {"theme": current_theme}
+
 @app.route("/")
 def index():
     #print("Rendering index page...")

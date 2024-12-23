@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Add New Story</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/general.css">
+    <link rel="stylesheet" href="/static/css/themes.css">
     <style>
         .error {
             color: red;
@@ -43,7 +44,7 @@
     </style>
     <script src="/static/js/trial_popup.js"></script>
 </head>
-<body class="black-bg">
+<body class="{{ theme }}">
     <h1>Add New Story</h1>
 
     {% if errors %}
@@ -207,7 +208,7 @@
                     }
                 });
             };
-            
+
             imageButtonsDiv.appendChild(regenerateImageButton);
             imageButtonsDiv.appendChild(aiAssistantImageButton);
             pageImageDiv.appendChild(imageButtonsDiv);
