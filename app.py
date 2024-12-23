@@ -41,7 +41,7 @@ def load_books():
                 print(f"Error decoding JSON for {folder}")
     return books
 
-current_theme = "theme-dark"
+current_theme = "theme-light"
 
 @app.context_processor
 def inject_theme():
